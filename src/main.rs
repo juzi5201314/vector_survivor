@@ -96,8 +96,8 @@ fn main() {
             Update,
             (
                 move_player,
-                move_player_with_touch,
-                move_player_with_mouse,
+                //move_player_with_touch,
+                //move_player_with_mouse,
                 camera_follow,
                 enemy_approaches_player,
                 player_fire,
