@@ -1,0 +1,5 @@
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-Zshare-generics=n", "-Ctarget-feature=+crt-static"]
+
+[target.wasm32-unknown-unknown]
+runner = "wasm-server-runner"
