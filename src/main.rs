@@ -2,6 +2,8 @@
 
 use std::time::Duration;
 
+use bevy::core::TaskPoolThreadAssignmentPolicy;
+use bevy::pbr::ClusterConfig;
 use bevy::prelude::*;
 use bevy::render::settings::WgpuSettings;
 use bevy::render::RenderPlugin;
@@ -68,6 +70,28 @@ fn main() {
                         ..Default::default()
                     }
                     .into(),
+                })
+                .set(TaskPoolPlugin {
+                    task_pool_options: TaskPoolOptions {
+                        io: TaskPoolThreadAssignmentPolicy {
+                            min_threads: 1,
+                            max_threads: 1,
+                            percent: 0.0,
+                        },
+
+                        async_compute: TaskPoolThreadAssignmentPolicy {
+                            min_threads: 1,
+                            max_threads: 2,
+                            percent: 0.25,
+                        },
+
+                        compute: TaskPoolThreadAssignmentPolicy {
+                            min_threads: 1,
+                            max_threads: std::usize::MAX,
+                            percent: 1.0,
+                        },
+                        ..Default::default()
+                    },
                 }),
         )
         //.add_plugins(TomlAssetPlugin::<Weapons>::new(&["weapons.toml"]),)
@@ -144,13 +168,21 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle {
-        camera: Camera {
-            hdr: false,
+    commands.spawn((
+        Camera2dBundle {
+            camera: Camera {
+                hdr: false,
+                ..Default::default()
+            },
             ..Default::default()
         },
-        ..Default::default()
-    });
+        ClusterConfig::FixedZ {
+            total: 1024,
+            z_slices: 1,
+            dynamic_resizing: true,
+            z_config: Default::default(),
+        },
+    ));
 }
 
 fn camera_follow(
