@@ -230,8 +230,9 @@ fn spawn_enemy(
     let player = player.single();
 
     if time.elapsed_seconds() % 1.0 == 0f32 {
+        let game_time = (time.elapsed() - game_time.0).as_secs();
         let mut rng = rand::thread_rng();
-        let count = (game_time.0.as_secs() / 5).max(2);
+        let count = (game_time / 5).max(2);
         for _ in 0..count {
             let x1 = player.translation.x + window.width() / 2f32;
             let x2 = player.translation.x - window.width() / 2f32;
@@ -262,10 +263,9 @@ fn spawn_enemy(
                 GameEntity,
                 Enemy,
                 MoveSpeed(
-                    80.0 + rng.gen_range(
-                        (game_time.0.as_secs() / 20 * 5).min(100)
-                            ..=(game_time.0.as_secs() / 10 * 5).min(200),
-                    ) as f32,
+                    80.0 + rng
+                        .gen_range((game_time / 20 * 5).min(100)..=(game_time / 10 * 5).min(200))
+                        as f32,
                 ),
                 RigidBody::Dynamic,
                 Collider::ball(4.5),
