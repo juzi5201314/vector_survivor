@@ -67,21 +67,21 @@ pub fn select_upgrade_ui(
                         font_assets.chs.clone(),
                         "select_upgrade:move_speed",
                         "移速升级",
-                        "\n\n玩家移动速度 +3%",
+                        "\n\n玩家移动速度 +5%",
                     );
                     spawn_select_upgrade_ui_button(
                         builder,
                         font_assets.chs.clone(),
                         "select_upgrade:fire_rate",
                         "射速升级",
-                        "\n\n开火速率(每分钟) +3%",
+                        "\n\n开火速率(每分钟) +5%",
                     );
                     spawn_select_upgrade_ui_button(
                         builder,
                         font_assets.chs.clone(),
                         "select_upgrade:bullet_speed",
                         "弹速升级",
-                        "\n\n子弹飞行速度 +3%",
+                        "\n\n子弹飞行速度 +5%",
                     );
                     if lvl.single().0 % 5 == 0 {
                         spawn_select_upgrade_ui_button(

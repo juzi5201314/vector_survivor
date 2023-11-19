@@ -1,10 +1,10 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::{
-    Commands, CursorMoved, DespawnRecursiveExt, Entity, EventReader, EventWriter, Input, KeyCode,
+    Camera, Commands, DespawnRecursiveExt, Entity, EventReader, EventWriter, Input, KeyCode,
     MouseButton, NextState, Quat, Query, Res, ResMut, Time, TouchInput, Transform, Vec2, Vec3,
     Vec3Swizzles, With, Without,
 };
-use bevy_xpbd_2d::prelude::Collision;
+use bevy_xpbd_2d::prelude::{AngularVelocity, Collision, LinearVelocity};
 
 use crate::components::{AttackTarget, Bullet, MoveSpeed};
 use crate::events::KillEvent;
@@ -90,10 +90,20 @@ pub fn move_player(
 pub fn enemy_approaches_player(
     players: Query<&Transform, With<Player>>,
     time: Res<Time>,
-    mut enemies: Query<(&mut Transform, &MoveSpeed), (With<Enemy>, Without<Player>)>,
+    mut enemies: Query<
+        (
+            &mut Transform,
+            &MoveSpeed,
+            &mut LinearVelocity,
+            &mut AngularVelocity,
+        ),
+        (With<Enemy>, Without<Player>),
+    >,
 ) {
     let player = players.get_single().unwrap();
-    for (mut enemy, speed) in &mut enemies {
+    for (mut enemy, speed, mut l, mut a) in &mut enemies {
+        l.0 = Vec2::ZERO;
+        a.0 = 0.0;
         let z = enemy.translation.z;
         enemy.rotation = rotate_to(enemy.translation.xy(), player.translation.xy());
         let local_y = enemy.local_y();

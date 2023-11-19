@@ -8,6 +8,8 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.12.0", features = [] }
 bevy_asset_loader = "0.18.0"
+bevy_embedded_assets = "0.9.1"
+bevy_screen_diagnostics = "0.4.0"
 #bevy_common_assets = { version = "0.8.0", features = ["ron", "toml"] }
 #bevy_ecs_tilemap = { git = "https://github.com/divark/bevy_ecs_tilemap", branch = "0.12-fixes" }
 bevy_vector_shapes = "0.6.0"
@@ -21,7 +23,7 @@ default = []
 dynamic_linking = ["bevy/dynamic_linking"]
 
 [profile.release]
-lto = true
+#lto = true
 
 [profile.web]
 inherits = "release"

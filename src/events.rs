@@ -36,7 +36,7 @@ pub fn read_player_move_speed_up_event(
 ) {
     let mut speed = speed.single_mut();
     for _ in ev_player_move_speed_up.read() {
-        speed.0 *= 1.03;
+        speed.0 *= 1.05;
         ev_props_update.send(PropsUpdateEvent);
     }
 }
@@ -48,7 +48,7 @@ pub fn read_player_fire_rate_up_event(
 ) {
     let mut rate = rate.single_mut();
     for _ in ev_player_fire_rate_up.read() {
-        rate.0 *= 1.03;
+        rate.0 *= 1.05;
         ev_props_update.send(PropsUpdateEvent);
     }
 }
@@ -60,7 +60,7 @@ pub fn read_player_bullet_speed_up_event(
 ) {
     let mut speed = speed.single_mut();
     for _ in ev_player_bullet_speed_up.read() {
-        speed.0 *= 1.03;
+        speed.0 *= 1.05;
         ev_props_update.send(PropsUpdateEvent);
     }
 }

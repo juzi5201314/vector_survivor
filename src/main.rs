@@ -1,20 +1,23 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use crate::assets::{AudioAssets, FontAssets, GameTime, Killed};
+use std::time::Duration;
+
 use bevy::prelude::*;
 use bevy::render::settings::WgpuSettings;
 use bevy::render::RenderPlugin;
 use bevy::window::PrimaryWindow;
 use bevy::DefaultPlugins;
 use bevy_asset_loader::prelude::{LoadingState, LoadingStateAppExt};
+use bevy_embedded_assets::{EmbeddedAssetPlugin, PluginMode};
+use bevy_screen_diagnostics::*;
 use bevy_vector_shapes::prelude::{
     DiscBundle, Rectangle, RectangleBundle, ShapeBundle, ShapeConfig,
 };
 use bevy_vector_shapes::Shape2dPlugin;
 use bevy_xpbd_2d::prelude::{Collider, Gravity, PhysicsPlugins, RigidBody};
 use rand::Rng;
-use std::time::Duration;
 
+use crate::assets::{AudioAssets, FontAssets, GameTime, Killed};
 use crate::components::{
     BulletSpeed, Enemy, FireRate, GameEntity, Level, MoveSpeed, Player, TargetCount, XPBar, BGM, XP,
 };
@@ -25,10 +28,7 @@ use crate::events::{
     PlayerTargetCountUpEvent, PropsUpdateEvent, StartEvent, XpIncEvent,
 };
 use crate::fire::player_fire;
-use crate::movement::{
-    bullet_collision, enemy_approaches_player, move_bullet, move_player, move_player_with_mouse,
-    move_player_with_touch,
-};
+use crate::movement::{bullet_collision, enemy_approaches_player, move_bullet, move_player};
 use crate::states::AppState;
 use crate::tutorial::{close_tutorial, setup_tutorial};
 use crate::ui::{
@@ -47,6 +47,9 @@ mod ui;
 
 fn main() {
     App::new()
+        .add_plugins(EmbeddedAssetPlugin {
+            mode: PluginMode::ReplaceDefault,
+        })
         .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
@@ -70,6 +73,8 @@ fn main() {
         //.add_plugins(TomlAssetPlugin::<Weapons>::new(&["weapons.toml"]),)
         .add_plugins(PhysicsPlugins::default())
         .add_plugins(Shape2dPlugin::default())
+        .add_plugins(ScreenDiagnosticsPlugin::default())
+        .add_plugins((ScreenFrameDiagnosticsPlugin, ScreenEntityDiagnosticsPlugin))
         .add_event::<XpIncEvent>()
         .add_event::<KillEvent>()
         .add_event::<PlayerMoveSpeedUpEvent>()
@@ -226,7 +231,7 @@ fn spawn_enemy(
 
     if time.elapsed_seconds() % 1.0 == 0f32 {
         let mut rng = rand::thread_rng();
-        let count = rng.gen_range(1..=(game_time.0.as_secs() / 20).max(1));
+        let count = (game_time.0.as_secs() / 5).max(2);
         for _ in 0..count {
             let x1 = player.translation.x + window.width() / 2f32;
             let x2 = player.translation.x - window.width() / 2f32;
@@ -256,7 +261,12 @@ fn spawn_enemy(
                 ),
                 GameEntity,
                 Enemy,
-                MoveSpeed(rng.gen_range(80..=(game_time.0.as_secs() / 20 * 10).max(80)) as f32),
+                MoveSpeed(
+                    80.0 + rng.gen_range(
+                        (game_time.0.as_secs() / 20 * 5).min(100)
+                            ..=(game_time.0.as_secs() / 10 * 5).min(200),
+                    ) as f32,
+                ),
                 RigidBody::Dynamic,
                 Collider::ball(4.5),
             ));
