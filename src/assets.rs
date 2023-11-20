@@ -3,6 +3,9 @@ use bevy_asset_loader::prelude::AssetCollection;
 use std::time::Duration;
 
 #[derive(Debug, Clone, Resource)]
+pub struct Rng(pub rand::rngs::SmallRng);
+
+#[derive(Debug, Clone, Resource)]
 pub struct GameTime(pub Duration);
 
 #[derive(Debug, Clone, Resource)]

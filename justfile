@@ -1,6 +1,9 @@
 #!/usr/bin/env just --justfile
 set windows-shell := ["powershell.exe", "-c"]
 
+web:
+    cargo run --target wasm32-unknown-unknown
+
 release:
     cargo build --release
 

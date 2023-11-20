@@ -17,9 +17,10 @@ use bevy_vector_shapes::prelude::{
 };
 use bevy_vector_shapes::Shape2dPlugin;
 use bevy_xpbd_2d::prelude::{Collider, Gravity, PhysicsPlugins, RigidBody};
-use rand::Rng;
+use rand::prelude::SmallRng;
+use rand::{Rng, SeedableRng};
 
-use crate::assets::{AudioAssets, FontAssets, GameTime, Killed};
+use crate::assets::{AudioAssets, FontAssets, GameTime, Killed, Rng as RngRes};
 use crate::components::{
     BulletSpeed, Enemy, FireRate, GameEntity, Level, MoveSpeed, Player, TargetCount, XPBar, BGM, XP,
 };
@@ -162,6 +163,8 @@ fn main() {
         .insert_resource(Gravity(Vec2::ZERO))
         .insert_resource(GameTime(Duration::ZERO))
         .insert_resource(Killed(0))
+        .insert_resource(Msaa::Off)
+        .insert_resource(RngRes(SmallRng::from_entropy()))
         .add_collection_to_loading_state::<_, FontAssets>(AppState::Loading)
         .add_collection_to_loading_state::<_, AudioAssets>(AppState::Loading)
         .run();
@@ -257,14 +260,16 @@ fn spawn_enemy(
     window: Query<&Window, With<PrimaryWindow>>,
     player: Query<&Transform, With<Player>>,
     game_time: Res<GameTime>,
+    mut rng: ResMut<RngRes>,
 ) {
     let window = window.single();
     let player = player.single();
 
     if time.elapsed_seconds() % 1.0 == 0f32 {
         let game_time = (time.elapsed() - game_time.0).as_secs();
-        let mut rng = rand::thread_rng();
         let count = (game_time / 5).max(2);
+        let mut rng = &mut rng.0;
+
         for _ in 0..count {
             let x1 = player.translation.x + window.width() / 2f32;
             let x2 = player.translation.x - window.width() / 2f32;

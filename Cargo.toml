@@ -15,7 +15,7 @@ bevy_screen_diagnostics = "0.4.0"
 bevy_vector_shapes = "0.6.0"
 bevy_xpbd_2d = { version = "0.3.2", features = ["simd"] }
 glidesort = "0.1.2"
-rand = "0.8.5"
+rand = { git = "https://github.com/rust-random/rand", features = ["small_rng", "simd_support"] }
 serde = { version = "1.0.192", features = ["derive"] }
 
 [features]
