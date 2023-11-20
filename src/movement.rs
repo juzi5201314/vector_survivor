@@ -101,7 +101,18 @@ pub fn enemy_approaches_player(
     >,
 ) {
     let player = players.get_single().unwrap();
-    for (mut enemy, speed, mut l, mut a) in &mut enemies {
+    enemies
+        .par_iter_mut()
+        .for_each(|(mut enemy, speed, mut l, mut a)| {
+            l.0 = Vec2::ZERO;
+            a.0 = 0.0;
+            let z = enemy.translation.z;
+            enemy.rotation = rotate_to(enemy.translation.xy(), player.translation.xy());
+            let local_y = enemy.local_y();
+            enemy.translation += local_y * speed.0 * time.delta_seconds();
+            enemy.translation.z = z;
+        });
+    /*for (mut enemy, speed, mut l, mut a) in &mut enemies {
         l.0 = Vec2::ZERO;
         a.0 = 0.0;
         let z = enemy.translation.z;
@@ -109,11 +120,7 @@ pub fn enemy_approaches_player(
         let local_y = enemy.local_y();
         enemy.translation += local_y * speed.0 * time.delta_seconds();
         enemy.translation.z = z;
-        /*let direction = move_to(&enemy.translation, &player.translation);
-        let z = enemy.translation.z;
-        enemy.translation += (direction * speed.0).extend(0f32);
-        enemy.translation.z = z;*/
-    }
+    }*/
 }
 
 pub fn move_bullet(
@@ -121,10 +128,24 @@ pub fn move_bullet(
     enemies: Query<&Transform, (With<Enemy>, Without<Bullet>)>,
     time: Res<Time>,
 ) {
-    for (mut transform, speed, target) in &mut bullets {
+    bullets
+        .par_iter_mut()
+        .for_each(|(mut transform, speed, target)| {
+            if let Ok(enemy) = enemies.get(target.0) {
+                transform.rotation = rotate_to(transform.translation.xy(), enemy.translation.xy());
+                //*direction = move_to(&transform.translation, &enemy.translation)
+            }
+
+            let z = transform.translation.z;
+            //transform.translation += (*direction * speed.0).extend(0f32);
+            let local_y = transform.local_y();
+            transform.translation += local_y * speed.0 * time.delta_seconds();
+            transform.translation.z = z;
+        });
+    /*for (mut transform, speed, target) in &mut bullets {
         if let Ok(enemy) = enemies.get(target.0) {
             transform.rotation = rotate_to(transform.translation.xy(), enemy.translation.xy());
-            //*direction = move_to(&transform.translation, &enemy.translation)
+            // *direction = move_to(&transform.translation, &enemy.translation)
         }
 
         let z = transform.translation.z;
@@ -132,7 +153,7 @@ pub fn move_bullet(
         let local_y = transform.local_y();
         transform.translation += local_y * speed.0 * time.delta_seconds();
         transform.translation.z = z;
-    }
+    }*/
 }
 
 pub fn bullet_collision(
